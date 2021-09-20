@@ -1,0 +1,22 @@
+#app,
+#app div,
+#app a,
+#app p,
+#app span,
+#app table,
+#app thead,
+#app tbody,
+#app tr,
+#app td {
+  font-family: 'Poppins', sans-serif !important;
+}
+.card-shadow {
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.075) !important;
+  border-radius: 4px !important;
+}
+.size-18 {
+  font-size: 18px !important;
+}
+.size-13 {
+  font-size: 13px !important;
+}

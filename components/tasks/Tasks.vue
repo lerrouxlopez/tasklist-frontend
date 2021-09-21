@@ -22,7 +22,7 @@
           elevation="0"
           class="body-2 text-uppercase px-6"
           color="primary"
-          @click="newOffer = true"
+          @click="newTask = true"
         >
           <v-icon left>mdi-plus</v-icon>
           New Task
@@ -33,7 +33,7 @@
       <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="offers"
+        :items="tasks"
         :loading="load"
         :options="{
           itemsPerPage: 5,
@@ -151,25 +151,22 @@
         </template>
       </v-data-table>
     </div>
-    <v-dialog v-model="shareModal" max-width="600">
-      <SharePaymentModal />
+    <v-dialog v-model="newTask" max-width="700">
+      <NewTaskModal @newTask="showTask" />
     </v-dialog>
-    <v-dialog v-model="newOffer" max-width="700">
-      <NewOfferModal @newOffer="showOffer" />
-    </v-dialog>
-    <v-dialog v-model="viewOffer" max-width="985">
-      <ViewOfferModal
-        :offerID="currentOffer"
+    <v-dialog v-model="viewTask" max-width="985">
+      <ViewTaskModal
+        :taskID="currentTask"
         :key="randomkey"
-        @viewOffer="showView"
-        @editOffer="showEdit"
+        @viewTask="showView"
+        @editTask="showEdit"
       />
     </v-dialog>
-    <v-dialog v-model="editOffer" max-width="700">
-      <EditOfferModal
-        :offerID="currentOffer"
+    <v-dialog v-model="editTask" max-width="700">
+      <EditTaskModal
+        :taskID="currentTask"
         :key="randomkey"
-        @editOffer="showEdit"
+        @editTask="showEdit"
       />
     </v-dialog>
   </div>
@@ -178,17 +175,16 @@
 <script>
 export default {
   components: {
-    NewOfferModal: () => import('@/components/products/modals/NewOfferModal'),
-    ViewOfferModal: () => import('@/components/products/modals/ViewOfferModal'),
-    EditOfferModal: () => import('@/components/products/modals/EditOfferModal'),
+    NewTaskModal: () => import('@/components/tasks/modals/NewTaskModal'),
+    EditTaskModal: () => import('@/components/tasks/modals/NewTaskModal'),
+    ViewTaskModal: () => import('@/components/tasks/modals/NewTaskModal'),
   },
   data() {
     return {
       selected: [],
-      newOffer: false,
-      editOffer: false,
-      shareModal: false,
-      viewOffer: false,
+      newTask: false,
+      editTask: false,
+      viewTask: false,
       active: 'Ongoing Tasks',
       items: ['Ongoing Tasks', 'Completed Tasks', 'All'],
       headers: [
@@ -232,15 +228,43 @@ export default {
         },
       ],
       data: [],
-      offers: [],
+      tasks: [],
       load: true,
-      currentOffer: 0,
+      currentTask: 0,
       randomkey: 0,
     }
   },
   mounted() {
     this.load = false
   },
-  methods: {},
+  methods: {
+    showTask(value) {
+      this.newTask = value
+    },
+    showView(value) {
+      this.viewTask = value
+    },
+    showEdit(value) {
+      this.editTask = value
+    },
+    async getTasks() {
+      this.load = true
+      try {
+        const token = localStorage.getItem('auth._token.local')
+        const param = {
+          resellerid: this.$auth.user.id,
+          productid: this.$route.query.productid,
+          transactionid: this.$route.query.transactionid,
+        }
+        const response = await this.$offerRepository.GetOffers(param, token)
+        this.offers = response.offers
+        console.log('response: ', response)
+        this.load = false
+      } catch (error) {
+        this.load = false
+        console.log(error)
+      }
+    },
+  },
 }
 </script>
